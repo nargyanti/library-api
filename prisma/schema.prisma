@@ -12,3 +12,39 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Member {
+  id       Int        @id @default(autoincrement())
+  code     String     @unique
+  name     String
+  BookLoan BookLoan[]
+  Penalty  Penalty[]
+}
+
+model Book {
+  id       Int        @id @default(autoincrement())
+  code     String     @unique
+  title    String
+  author   String
+  stock    Int
+  BookLoan BookLoan[]
+}
+
+model BookLoan {
+  id          Int       @id @default(autoincrement())
+  member_id   Int
+  book_id     Int
+  borrow_at   DateTime  @default(now())
+  return_at   DateTime?
+  is_returned Boolean   @default(false)
+  Member      Member    @relation(fields: [member_id], references: [id])
+  Book        Book      @relation(fields: [book_id], references: [id])
+}
+
+model Penalty {
+  id        Int      @id @default(autoincrement())
+  member_id Int
+  start_at  DateTime @default(now())
+  end_at    DateTime @default(now())
+  Member    Member   @relation(fields: [member_id], references: [id])
+}
