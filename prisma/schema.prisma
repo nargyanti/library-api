@@ -14,23 +14,23 @@ datasource db {
 }
 
 model Member {
-  id       Int        @id @default(autoincrement())
-  code     String     @unique
-  name     String
-  BookLoan BookLoan[]
-  Penalty  Penalty[]
+  id      Int       @id @default(autoincrement())
+  code    String    @unique
+  name    String
+  Borrow    Borrow[]
+  Penalty Penalty[]
 }
 
 model Book {
-  id       Int        @id @default(autoincrement())
-  code     String     @unique
-  title    String
-  author   String
-  stock    Int
-  BookLoan BookLoan[]
+  id     Int    @id @default(autoincrement())
+  code   String @unique
+  title  String
+  author String
+  stock  Int
+  Borrow   Borrow[]
 }
 
-model BookLoan {
+model Borrow {
   id         Int       @id @default(autoincrement())
   member     Int
   book       Int
