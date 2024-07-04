@@ -17,25 +17,25 @@ model Member {
   id      Int       @id @default(autoincrement())
   code    String    @unique
   name    String
-  Borrow    Borrow[]
+  Borrow  Borrow[]
   Penalty Penalty[]
 }
 
 model Book {
-  id     Int    @id @default(autoincrement())
-  code   String @unique
+  id     Int      @id @default(autoincrement())
+  code   String   @unique
   title  String
   author String
   stock  Int
-  Borrow   Borrow[]
+  Borrow Borrow[]
 }
 
 model Borrow {
   id         Int       @id @default(autoincrement())
   member     Int
   book       Int
-  borrowAt   DateTime  @default(now())
-  returnAt   DateTime?
+  borrowedAt DateTime  @default(now())
+  returnedAt DateTime?
   isReturned Boolean   @default(false)
   Member     Member    @relation(fields: [member], references: [id])
   Book       Book      @relation(fields: [book], references: [id])
