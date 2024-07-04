@@ -31,20 +31,20 @@ model Book {
 }
 
 model BookLoan {
-  id          Int       @id @default(autoincrement())
-  member_id   Int
-  book_id     Int
-  borrow_at   DateTime  @default(now())
-  return_at   DateTime?
-  is_returned Boolean   @default(false)
-  Member      Member    @relation(fields: [member_id], references: [id])
-  Book        Book      @relation(fields: [book_id], references: [id])
+  id         Int       @id @default(autoincrement())
+  member     Int
+  book       Int
+  borrowAt   DateTime  @default(now())
+  returnAt   DateTime?
+  isReturned Boolean   @default(false)
+  Member     Member    @relation(fields: [member], references: [id])
+  Book       Book      @relation(fields: [book], references: [id])
 }
 
 model Penalty {
-  id        Int      @id @default(autoincrement())
-  member_id Int
-  start_at  DateTime @default(now())
-  end_at    DateTime @default(now())
-  Member    Member   @relation(fields: [member_id], references: [id])
+  id      Int      @id @default(autoincrement())
+  member  Int
+  startAt DateTime @default(now())
+  endAt   DateTime @default(now())
+  Member  Member   @relation(fields: [member], references: [id])
 }
