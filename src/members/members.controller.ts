@@ -17,7 +17,7 @@ export class MembersController {
   }
 
   @Get()
-  @ApiOkResponse({ type: [MemberEntity], isArray: true })
+  @ApiOkResponse({ type: MemberEntity, isArray: true })
   findAll() {
     return this.membersService.findAll();
   }

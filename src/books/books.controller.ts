@@ -17,7 +17,7 @@ export class BooksController {
   }
 
   @Get()
-  @ApiOkResponse({ type: [BookEntity], isArray: true })
+  @ApiOkResponse({ type: BookEntity, isArray: true })
   findAll() {
     return this.booksService.findAll();
   }

@@ -17,7 +17,7 @@ export class PenaltiesController {
   }
 
   @Get()
-  @ApiOkResponse({ type: [PenaltyEntity], isArray: true })
+  @ApiOkResponse({ type: PenaltyEntity, isArray: true })
   findAll() {
     return this.penaltiesService.findAll();
   }

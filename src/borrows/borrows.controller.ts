@@ -17,7 +17,7 @@ export class BorrowsController {
   }
 
   @Get()
-  @ApiOkResponse({ type: [BorrowEntity], isArray: true })
+  @ApiOkResponse({ type: BorrowEntity, isArray: true })
   findAll() {
     return this.borrowsService.findAll();
   }
