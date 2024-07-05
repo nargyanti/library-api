@@ -16,6 +16,14 @@ export class BorrowsService {
       throw new BadRequestException('Book is not available for borrowing.');
     }
 
+    // Check if member is registered
+    const member = await this.prisma.member.findUnique({
+      where: { id: createBorrowDto.member },
+    });
+    if (!member) {
+      throw new BadRequestException('Member not found.');
+    }
+
     // Check if member is penalized
     const isPenalized = await this.prisma.penalty.findFirst({
       where: {
@@ -65,7 +73,23 @@ export class BorrowsService {
   }
 
   async update(id: number, updateBorrowDto: UpdateBorrowDto) {
-    // if return date is set, update the book stock
+    // Check if book is available
+    const book = await this.prisma.book.findUnique({
+      where: { id: updateBorrowDto.book },
+    });
+    if (!book || book.stock <= 0) {
+      throw new BadRequestException('Book is not available for borrowing.');
+    }
+
+    // Check if member is registered
+    const member = await this.prisma.member.findUnique({
+      where: { id: updateBorrowDto.member },
+    });
+    if (!member) {
+      throw new BadRequestException('Member not found.');
+    }
+
+    // If return date is set, update the book stock
     if (updateBorrowDto.returnedAt !== null) {
       const borrow = await this.prisma.borrow.findUnique({ where: { id } });
       if (!borrow) {
@@ -77,13 +101,13 @@ export class BorrowsService {
         throw new BadRequestException('Book not found.');
       }
 
-      // if returnedAt is set, change isReturned to true
+      // If returnedAt is set, change isReturned to true
       const returnedBook = this.prisma.borrow.update({
         where: { id },
         data: { ...updateBorrowDto, isReturned: true },
       });
 
-      // if book is returned more than 7 days from borrowedAt, create penalty record
+      // If book is returned more than 7 days from borrowedAt, create penalty record
       const borrowedAt = new Date(borrow.borrowedAt);
       const returnedAt = new Date(updateBorrowDto.returnedAt);
       const diffTime = Math.abs(returnedAt.getTime() - borrowedAt.getTime());
@@ -92,8 +116,8 @@ export class BorrowsService {
         await this.prisma.penalty.create({
           data: {
             member: borrow.member,
-            startAt: new Date(),
-            endAt: new Date(new Date().setDate(new Date().getDate() + 3)),
+            startAt: new Date(returnedAt.setDate(returnedAt.getDate())),
+            endAt: new Date(returnedAt.setDate(returnedAt.getDate() + 3)),
           }
         });
       }
