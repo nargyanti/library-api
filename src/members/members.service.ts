@@ -11,12 +11,43 @@ export class MembersService {
     return this.prisma.member.create({ data: createMemberDto });
   }
 
-  findAll() {
-    return this.prisma.member.findMany();
+  // Get all members with borrowed books count
+  async findAll() {
+    const members = await this.prisma.member.findMany({
+      include: {
+        Borrow: {
+          where: {
+            isReturned: false,
+          },
+        },
+      },
+    });
+
+    const formattedMembers = members.map(member => ({
+      id: member.id,
+      code: member.code,
+      name: member.name,
+      borrowedBooksCount: member.Borrow.length,
+    }));
+
+    return formattedMembers;
   }
 
+  // Get member by id with borrowed books details
   findOne(id: number) {
-    return this.prisma.member.findUnique({ where: { id } });
+    return this.prisma.member.findUnique({
+      where: { id },
+      include: {
+        Borrow: {
+          where: {
+            isReturned: false,
+          },
+          include: {
+            Book: true,
+          }
+        },
+      },
+    });
   }
 
   update(id: number, updateMemberDto: UpdateMemberDto) {
