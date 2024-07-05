@@ -11,6 +11,7 @@ export class BooksService {
     return this.prisma.book.create({ data: createBookDto });
   }
 
+  // Get all books with available stock
   async findAll() {
     const borrowedBooks = await this.prisma.borrow.groupBy({
       by: ['book'],
@@ -33,9 +34,27 @@ export class BooksService {
     }));
   }
 
-  findOne(id: number) {
-    return this.prisma.book.findUnique({ where: { id } });
+  async findOne(id: number) {
+    const borrowedBooks = await this.prisma.borrow.groupBy({
+      by: ['book'],
+      where: {
+        isReturned: false
+      },
+      _count: true
+    });
+
+    const book = await this.prisma.book.findUnique({
+      where: { id: id }
+    });
+
+    const borrowedCount = borrowedBooks.length > 0 ? borrowedBooks[0]._count : 0;
+
+    return {
+      ...book,
+      stock: book.stock - borrowedCount
+    };
   }
+
 
   update(id: number, updateBookDto: UpdateBookDto) {
     return this.prisma.book.update({ where: { id }, data: updateBookDto });

@@ -11,7 +11,6 @@ export class MembersService {
     return this.prisma.member.create({ data: createMemberDto });
   }
 
-  // Get all members with borrowed books count
   async findAll() {
     const members = await this.prisma.member.findMany({
       include: {
@@ -33,21 +32,26 @@ export class MembersService {
     return formattedMembers;
   }
 
-  // Get member by id with borrowed books details
-  findOne(id: number) {
-    return this.prisma.member.findUnique({
+  async findOne(id: number) {
+    const member = await this.prisma.member.findFirst({
       where: { id },
       include: {
         Borrow: {
           where: {
             isReturned: false,
           },
-          include: {
-            Book: true,
-          }
         },
       },
     });
+
+    const formattedMember = {
+      id: member.id,
+      code: member.code,
+      name: member.name,
+      borrowedBooksCount: member.Borrow.length,
+    };
+
+    return formattedMember;
   }
 
   update(id: number, updateMemberDto: UpdateMemberDto) {

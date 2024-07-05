@@ -8,15 +8,15 @@ export class BorrowsService {
   constructor(private prisma: PrismaService) { }
 
   async create(createBorrowDto: CreateBorrowDto) {
-    // Get if book is available for borrowing
+    // Check if book is available
     const book = await this.prisma.book.findUnique({
       where: { id: createBorrowDto.book },
     });
-
     if (!book || book.stock <= 0) {
       throw new BadRequestException('Book is not available for borrowing.');
     }
 
+    // Check if member is penalized
     const isPenalized = await this.prisma.penalty.findFirst({
       where: {
         member: createBorrowDto.member,
@@ -26,10 +26,10 @@ export class BorrowsService {
       }
     });
     if (isPenalized) {
-      throw new BadRequestException("Member is penalized until " + isPenalized.endAt);
+      throw new BadRequestException("Member is penalized until " + isPenalized.endAt + ".");
     }
 
-    // Check if member has reached maximum borrow limit
+    // Check if member has borrowed more than 2 books
     const borrowCount = await this.prisma.borrow.count({
       where: {
         member: createBorrowDto.member,
@@ -37,10 +37,10 @@ export class BorrowsService {
       }
     });
     if (borrowCount + 1 > 2) {
-      throw new BadRequestException("Member cannot borrow more than 2 books");
+      throw new BadRequestException("Member cannot borrow more than 2 books.");
     }
 
-    // Check if book is borrowed by another member
+    // Check if book is already borrowed
     const isBookBorrowed = await this.prisma.borrow.findFirst({
       where: {
         book: createBorrowDto.book,
@@ -50,7 +50,6 @@ export class BorrowsService {
     if (isBookBorrowed) {
       throw new BadRequestException('Book is already borrowed by another member.');
     }
-
 
     return await this.prisma.borrow.create({
       data: createBorrowDto,
@@ -84,7 +83,7 @@ export class BorrowsService {
         data: { ...updateBorrowDto, isReturned: true },
       });
 
-      // if book is returned more than 7 days from borrowedAt, create penalty record      
+      // if book is returned more than 7 days from borrowedAt, create penalty record
       const borrowedAt = new Date(borrow.borrowedAt);
       const returnedAt = new Date(updateBorrowDto.returnedAt);
       const diffTime = Math.abs(returnedAt.getTime() - borrowedAt.getTime());
