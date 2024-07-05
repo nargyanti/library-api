@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,7 +7,23 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class BooksService {
   constructor(private prisma: PrismaService) { }
 
-  create(createBookDto: CreateBookDto) {
+  // Check if the code is unique
+  async isCodeUnique(code: string) {
+    const book = await this.prisma.book.findUnique({
+      where: {
+        code: code,
+      },
+    });
+
+    return !book;
+  }
+
+  async create(createBookDto: CreateBookDto) {
+    const isCodeUnique = await this.isCodeUnique(createBookDto.code);
+    if (!isCodeUnique) {
+      throw new BadRequestException('Code is already taken');
+    }
+
     return this.prisma.book.create({ data: createBookDto });
   }
 
@@ -38,7 +54,18 @@ export class BooksService {
     return this.prisma.book.findUnique({ where: { id } });
   }
 
-  update(id: number, updateBookDto: UpdateBookDto) {
+  async update(id: number, updateBookDto: UpdateBookDto) {
+    // Get book
+    const book = await this.prisma.book.findUnique({ where: { id } });
+
+    // Check if code is unique if it is changed
+    if (updateBookDto.code !== book.code) {
+      const isCodeUnique = await this.isCodeUnique(updateBookDto.code);
+      if (!isCodeUnique) {
+        throw new BadRequestException('Code is already taken');
+      }
+    }
+
     return this.prisma.book.update({ where: { id }, data: updateBookDto });
   }
 
