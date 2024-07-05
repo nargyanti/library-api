@@ -22,12 +22,6 @@ export class BooksController {
     return this.booksService.findAll();
   }
 
-  @Get('borrowed')
-  @ApiOkResponse({ type: [BookEntity], isArray: true })
-  findAllLoaned() {
-    return this.booksService.findAllLoaned();
-  }
-
   @Get(':id')
   @ApiOkResponse({ type: BookEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {

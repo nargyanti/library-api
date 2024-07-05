@@ -11,14 +11,26 @@ export class BooksService {
     return this.prisma.book.create({ data: createBookDto });
   }
 
-  findAll() {
-    // TODO: return book where book is not borrowed by member
-    return this.prisma.book.findMany();
-  }
+  async findAll() {
+    const borrowedBooks = await this.prisma.borrow.groupBy({
+      by: ['book'],
+      where: {
+        isReturned: false
+      },
+      _count: true
+    });
 
-  // TODO: loaned books based on isReturned is false
-  findAllLoaned() {
-    return this.prisma.book.findMany({ where: { stock: 0 } });
+    const books = await this.prisma.book.findMany();
+
+    const borrowedCounts = borrowedBooks.reduce((acc, curr) => ({
+      ...acc,
+      [curr.book]: curr._count
+    }), {});
+
+    return books.map(book => ({
+      ...book,
+      stock: book.stock - (borrowedCounts[book.id] || 0)
+    }));
   }
 
   findOne(id: number) {

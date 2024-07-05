@@ -51,20 +51,10 @@ export class BorrowsService {
       throw new BadRequestException('Book is already borrowed by another member.');
     }
 
-    // Create new borrow record
-    const newBorrow = await this.prisma.borrow.create({
+
+    return await this.prisma.borrow.create({
       data: createBorrowDto,
     });
-
-    // Update book stock
-    await this.prisma.book.update({
-      where: { id: createBorrowDto.book },
-      data: {
-        stock: book.stock - 1,
-      },
-    });
-
-    return newBorrow;
   }
 
   findAll() {
@@ -87,14 +77,6 @@ export class BorrowsService {
       if (!book) {
         throw new BadRequestException('Book not found.');
       }
-
-      // update book stock
-      this.prisma.book.update({
-        where: { id: borrow.book },
-        data: {
-          stock: book.stock + 1,
-        },
-      });
 
       // if returnedAt is set, change isReturned to true
       const returnedBook = this.prisma.borrow.update({
