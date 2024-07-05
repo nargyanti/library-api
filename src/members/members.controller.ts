@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
@@ -24,19 +24,19 @@ export class MembersController {
 
   @Get(':id')
   @ApiOkResponse({ type: MemberEntity })
-  findOne(@Param('id') id: string) {
-    return this.membersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.membersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: MemberEntity })
-  update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberDto) {
-    return this.membersService.update(+id, updateMemberDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateMemberDto: UpdateMemberDto) {
+    return this.membersService.update(id, updateMemberDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: MemberEntity })
-  remove(@Param('id') id: string) {
-    return this.membersService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.membersService.remove(id);
   }
 }
