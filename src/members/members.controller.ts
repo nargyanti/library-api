@@ -24,19 +24,32 @@ export class MembersController {
 
   @Get(':id')
   @ApiOkResponse({ type: MemberEntity })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.membersService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const member = await this.membersService.findOne(id);
+    if (!member) {
+      throw new NotFoundException(`Member with id ${id} not found`);
+    }
+    return member;
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: MemberEntity })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateMemberDto: UpdateMemberDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateMemberDto: UpdateMemberDto) {
+    const member = await this.membersService.findOne(id);
+    if (!member) {
+      throw new NotFoundException(`Member with id ${id} not found`);
+    }
+
     return this.membersService.update(id, updateMemberDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: MemberEntity })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const member = await this.membersService.findOne(id);
+    if (!member) {
+      throw new NotFoundException(`Member with id ${id} not found`);
+    }
     return this.membersService.remove(id);
   }
 }

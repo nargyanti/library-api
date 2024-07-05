@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { BorrowsService } from './borrows.service';
 import { CreateBorrowDto } from './dto/create-borrow.dto';
 import { UpdateBorrowDto } from './dto/update-borrow.dto';
@@ -24,19 +24,33 @@ export class BorrowsController {
 
   @Get(':id')
   @ApiOkResponse({ type: BorrowEntity })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.borrowsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const borrow = await this.borrowsService.findOne(id);
+    if (!borrow) {
+      throw new NotFoundException(`Borrow with id ${id} not found`);
+    }
+    return borrow;
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: BorrowEntity })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateBorrowDto: UpdateBorrowDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateBorrowDto: UpdateBorrowDto) {
+    const borrow = await this.borrowsService.findOne(id);
+    if (!borrow) {
+      throw new NotFoundException(`Borrow with id ${id} not found`);
+    }
+
     return this.borrowsService.update(id, updateBorrowDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: BorrowEntity })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const borrow = await this.borrowsService.findOne(id);
+    if (!borrow) {
+      throw new NotFoundException(`Borrow with id ${id} not found`);
+    }
+
     return this.borrowsService.remove(id);
   }
 }

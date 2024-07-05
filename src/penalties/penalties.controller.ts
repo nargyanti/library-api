@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { PenaltiesService } from './penalties.service';
 import { CreatePenaltyDto } from './dto/create-penalty.dto';
 import { UpdatePenaltyDto } from './dto/update-penalty.dto';
@@ -24,19 +24,33 @@ export class PenaltiesController {
 
   @Get(':id')
   @ApiOkResponse({ type: PenaltyEntity })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.penaltiesService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const penalty = await this.penaltiesService.findOne(id);
+    if (!penalty) {
+      throw new NotFoundException(`Penalty with id ${id} not found`);
+    }
+    return penalty;
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: PenaltyEntity })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updatePenaltyDto: UpdatePenaltyDto) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updatePenaltyDto: UpdatePenaltyDto) {
+    const penalty = await this.penaltiesService.findOne(id);
+    if (!penalty) {
+      throw new NotFoundException(`Penalty with id ${id} not found`);
+    }
+
     return this.penaltiesService.update(id, updatePenaltyDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: PenaltyEntity })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const penalty = await this.penaltiesService.findOne(id);
+    if (!penalty) {
+      throw new NotFoundException(`Penalty with id ${id} not found`);
+    }
+
     return this.penaltiesService.remove(id);
   }
 }
