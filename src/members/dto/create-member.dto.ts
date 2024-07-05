@@ -1,9 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsString, MaxLength, MinLength, IsNotEmpty } from "class-validator";
 
 export class CreateMemberDto {
-    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    @MinLength(4)
+    @MaxLength(4)
+    @ApiProperty({ example: 'M001' })
+    // TODO: code is unique    
     code: string;
 
-    @ApiProperty()
+    @IsString()
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ example: 'John Doe' })
     name: string;
 }

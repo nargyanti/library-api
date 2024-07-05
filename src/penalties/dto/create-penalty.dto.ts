@@ -1,12 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString, IsNumber, IsNotEmpty } from "class-validator";
 
 export class CreatePenaltyDto {
-    @ApiProperty()
+    // TODO: validation for member is exist
+    @IsNumber()
+    @IsNotEmpty()
+    @ApiProperty({ example: 1 })
     member: number;
 
-    @ApiProperty()
-    startAt: Date;
+    @IsDateString()
+    @IsNotEmpty()
+    @ApiProperty({ default: new Date() })
+    startAt: Date = new Date();
 
-    @ApiProperty()
-    endAt: Date;
+    @IsNotEmpty()
+    @IsDateString()
+    @ApiProperty({ default: new Date(new Date().setDate(new Date().getDate() + 3)) })
+    endAt?: Date = new Date(new Date().setDate(new Date().getDate() + 3));
 }

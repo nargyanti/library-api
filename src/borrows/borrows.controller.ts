@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { BorrowsService } from './borrows.service';
 import { CreateBorrowDto } from './dto/create-borrow.dto';
 import { UpdateBorrowDto } from './dto/update-borrow.dto';
@@ -24,19 +24,19 @@ export class BorrowsController {
 
   @Get(':id')
   @ApiOkResponse({ type: BorrowEntity })
-  findOne(@Param('id') id: string) {
-    return this.borrowsService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.borrowsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: BorrowEntity })
-  update(@Param('id') id: string, @Body() updateBorrowDto: UpdateBorrowDto) {
-    return this.borrowsService.update(+id, updateBorrowDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateBorrowDto: UpdateBorrowDto) {
+    return this.borrowsService.update(id, updateBorrowDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: BorrowEntity })
-  remove(@Param('id') id: string) {
-    return this.borrowsService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.borrowsService.remove(id);
   }
 }
