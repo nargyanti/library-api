@@ -29,7 +29,7 @@ export class BooksController {
     if (!book) {
       throw new NotFoundException(`Book with id ${id} not found`);
     }
-    return this.booksService.findOne(id);
+    return book;
   }
 
   @Patch(':id')

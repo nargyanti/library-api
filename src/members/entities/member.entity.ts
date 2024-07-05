@@ -10,4 +10,7 @@ export class MemberEntity implements Member {
 
     @ApiProperty()
     name: string;
+
+    @ApiProperty()
+    borrowedBooksCount: number;
 }

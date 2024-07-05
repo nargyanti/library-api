@@ -7,7 +7,6 @@ export class CreateMemberDto {
     @MinLength(4)
     @MaxLength(4)
     @ApiProperty({ example: 'M001' })
-    // TODO: code is unique    
     code: string;
 
     @IsString()

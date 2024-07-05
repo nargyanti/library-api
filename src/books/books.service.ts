@@ -35,26 +35,8 @@ export class BooksService {
   }
 
   async findOne(id: number) {
-    const borrowedBooks = await this.prisma.borrow.groupBy({
-      by: ['book'],
-      where: {
-        isReturned: false
-      },
-      _count: true
-    });
-
-    const book = await this.prisma.book.findUnique({
-      where: { id: id }
-    });
-
-    const borrowedCount = borrowedBooks.length > 0 ? borrowedBooks[0]._count : 0;
-
-    return {
-      ...book,
-      stock: book.stock - borrowedCount
-    };
+    return this.prisma.book.findUnique({ where: { id } });
   }
-
 
   update(id: number, updateBookDto: UpdateBookDto) {
     return this.prisma.book.update({ where: { id }, data: updateBookDto });

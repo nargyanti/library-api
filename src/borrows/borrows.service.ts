@@ -66,7 +66,7 @@ export class BorrowsService {
 
   async update(id: number, updateBorrowDto: UpdateBorrowDto) {
     // if return date is set, update the book stock
-    if (updateBorrowDto.returnedAt) {
+    if (updateBorrowDto.returnedAt !== null) {
       const borrow = await this.prisma.borrow.findUnique({ where: { id } });
       if (!borrow) {
         throw new BadRequestException('Borrow not found.');
