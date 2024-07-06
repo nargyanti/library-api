@@ -7,7 +7,6 @@ export class CreateBookDto {
     @MinLength(5)
     @MaxLength(6)
     @ApiProperty({ example: 'SHY-01' })
-    // TODO: code is unique    
     code: string;
 
     @IsString()

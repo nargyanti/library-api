@@ -2,13 +2,11 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsDateString, IsNumber, IsNotEmpty, IsOptional, IsBoolean } from "class-validator";
 
 export class CreateBorrowDto {
-    // TODO: validation for member is exist
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty({ example: 1 })
     member: number;
 
-    // TODO: validation for book is exist
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty({ example: 1 })
